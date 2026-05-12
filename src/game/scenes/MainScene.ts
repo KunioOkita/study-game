@@ -8,14 +8,23 @@ export class MainScene extends Scene {
     
     nextEnemyTime: number = 0;
     placingTower: boolean = false;
-    towerPreview!: Phaser.GameObjects.Arc;
+    towerPreview!: Phaser.GameObjects.Image;
 
     constructor() {
         super('MainScene');
     }
 
+    preload() {
+        this.load.image('background', '/assets/background.png');
+        this.load.image('base', '/assets/base.png');
+        this.load.image('enemy', '/assets/enemy.png');
+        this.load.image('tower', '/assets/tower.png');
+        this.load.image('bullet', '/assets/bullet.png');
+    }
+
     create() {
-        this.cameras.main.setBackgroundColor('#2d2d2d');
+        const bg = this.add.image(400, 300, 'background');
+        bg.setDisplaySize(800, 600);
 
         // グループの作成
         this.enemies = this.add.group();
@@ -23,11 +32,14 @@ export class MainScene extends Scene {
         this.bullets = this.add.group();
 
         // ベース陣地（右側）
-        const base = this.add.rectangle(750, 300, 100, 600, 0x0044ff, 0.3);
+        const base = this.add.image(750, 300, 'base');
+        base.setDisplaySize(150, 600);
         this.physics.add.existing(base, true); // static
 
         // タワー配置のプレビュー
-        this.towerPreview = this.add.circle(0, 0, 20, 0x00ff00, 0.5);
+        this.towerPreview = this.add.image(0, 0, 'tower');
+        this.towerPreview.setDisplaySize(60, 60);
+        this.towerPreview.setAlpha(0.5);
         this.towerPreview.setVisible(false);
 
         // マウス移動とクリックのイベント
@@ -74,7 +86,7 @@ export class MainScene extends Scene {
 
         // 敵の移動とベース到達判定
         this.enemies.getChildren().forEach((child: any) => {
-            const enemy = child as Phaser.GameObjects.Rectangle & { hp: number };
+            const enemy = child as Phaser.GameObjects.Image & { hp: number };
             enemy.x += 1; // 移動速度
             if (enemy.x > 700) {
                 // ベースに到達
@@ -85,7 +97,7 @@ export class MainScene extends Scene {
 
         // タワーの攻撃処理
         this.towers.getChildren().forEach((child: any) => {
-            const tower = child as Phaser.GameObjects.Arc & { lastFired: number };
+            const tower = child as Phaser.GameObjects.Image & { lastFired: number };
             if (time > tower.lastFired + 1000) { // 1秒に1回攻撃
                 // 一番近い敵を探す
                 let target: any = null;
@@ -109,20 +121,23 @@ export class MainScene extends Scene {
 
     spawnEnemy() {
         const y = Phaser.Math.Between(100, 500);
-        const enemy = this.add.rectangle(0, y, 30, 30, 0xff0000) as any;
+        const enemy = this.add.image(0, y, 'enemy') as any;
+        enemy.setDisplaySize(50, 50);
         this.physics.add.existing(enemy);
         enemy.hp = 30; // 3発で倒せる
         this.enemies.add(enemy);
     }
 
     placeTower(x: number, y: number) {
-        const tower = this.add.circle(x, y, 20, 0x00ff00) as any;
+        const tower = this.add.image(x, y, 'tower') as any;
+        tower.setDisplaySize(60, 60);
         tower.lastFired = 0;
         this.towers.add(tower);
     }
 
     fireBullet(x: number, y: number, target: any) {
-        const bullet = this.add.circle(x, y, 5, 0xffff00) as any;
+        const bullet = this.add.image(x, y, 'bullet') as any;
+        bullet.setDisplaySize(20, 20);
         this.physics.add.existing(bullet);
         this.bullets.add(bullet);
         this.physics.moveToObject(bullet, target, 300); // 弾の速度
