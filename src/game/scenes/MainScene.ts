@@ -65,9 +65,20 @@ export class MainScene extends Scene {
 
         // 衝突判定: 弾と敵
         this.physics.add.overlap(this.bullets, this.enemies, (bullet: any, enemy: any) => {
+            this.createHitEffect(bullet.x, bullet.y);
             bullet.destroy();
             enemy.hp -= 10;
+            
+            // ダメージ表現（一瞬だけ白く光らせる）
+            enemy.setTintFill(0xffffff);
+            this.time.delayedCall(100, () => {
+                if (enemy && enemy.active) {
+                    enemy.clearTint();
+                }
+            });
+
             if (enemy.hp <= 0) {
+                this.createExplosion(enemy.x, enemy.y);
                 enemy.destroy();
                 EventBus.emit('enemy-killed');
             }
@@ -144,5 +155,37 @@ export class MainScene extends Scene {
         bullet.body.setCircle(bullet.width * 0.3, bullet.width * 0.2, bullet.width * 0.2);
         this.bullets.add(bullet);
         this.physics.moveToObject(bullet, target, 300); // 弾の速度
+    }
+
+    createExplosion(x: number, y: number) {
+        const emitter = this.add.particles(x, y, 'bullet', {
+            speed: { min: 100, max: 300 },
+            scale: { start: 0.2, end: 0 },
+            alpha: { start: 1, end: 0 },
+            lifespan: 400,
+            blendMode: 'ADD',
+            emitting: false
+        });
+        emitter.explode(15);
+        
+        this.time.delayedCall(500, () => {
+            emitter.destroy();
+        });
+    }
+
+    createHitEffect(x: number, y: number) {
+        const emitter = this.add.particles(x, y, 'bullet', {
+            speed: { min: 50, max: 150 },
+            scale: { start: 0.1, end: 0 },
+            alpha: { start: 0.8, end: 0 },
+            lifespan: 200,
+            blendMode: 'ADD',
+            emitting: false
+        });
+        emitter.explode(5); // 小さな爆発（5パーティクル）
+        
+        this.time.delayedCall(300, () => {
+            emitter.destroy();
+        });
     }
 }
