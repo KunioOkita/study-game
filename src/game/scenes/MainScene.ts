@@ -21,6 +21,7 @@ export class MainScene extends Scene {
         this.load.image('enemy', '/assets/enemy.png');
         this.load.image('tower', '/assets/tower.png');
         this.load.image('bullet', '/assets/bullet.png');
+        this.load.image('cloud', '/assets/cloud.png');
     }
 
     create() {
@@ -94,15 +95,15 @@ export class MainScene extends Scene {
     }
 
     update(time: number, _delta: number) {
-        // 敵の生成
-        const spawnInterval = 2000 - (this.currentLevel - 1) * 150;
+        // 敵の生成 (Lv1: 4秒に1匹, Lv10: 0.85秒に1匹)
+        const spawnInterval = 4000 - (this.currentLevel - 1) * 350;
         if (time > this.nextEnemyTime) {
             this.spawnEnemy();
             this.nextEnemyTime = time + spawnInterval;
         }
 
-        // 敵の移動とベース到達判定
-        const speed = 1 + (this.currentLevel - 1) * 0.2;
+        // 敵の移動とベース到達判定 (Lv1: スピード0.4, Lv10: スピード2.65)
+        const speed = 0.4 + (this.currentLevel - 1) * 0.25;
         this.enemies.getChildren().forEach((child: any) => {
             const enemy = child as Phaser.GameObjects.Image & { hp: number };
             enemy.x += speed; // 移動速度
@@ -165,15 +166,15 @@ export class MainScene extends Scene {
     }
 
     createExplosion(x: number, y: number) {
-        const emitter = this.add.particles(x, y, 'bullet', {
-            speed: { min: 100, max: 300 },
-            scale: { start: 0.2, end: 0 },
-            alpha: { start: 1, end: 0 },
-            lifespan: 400,
-            blendMode: 'ADD',
+        const emitter = this.add.particles(x, y, 'cloud', {
+            speed: { min: 30, max: 80 },
+            scale: { start: 0.15, end: 0.3 },
+            alpha: { start: 0.8, end: 0 },
+            lifespan: 600,
+            blendMode: 'NORMAL',
             emitting: false
         });
-        emitter.explode(15);
+        emitter.explode(8); // ふわっとした雲が数個広がる
         
         this.time.delayedCall(500, () => {
             emitter.destroy();
@@ -181,15 +182,15 @@ export class MainScene extends Scene {
     }
 
     createHitEffect(x: number, y: number) {
-        const emitter = this.add.particles(x, y, 'bullet', {
-            speed: { min: 50, max: 150 },
-            scale: { start: 0.1, end: 0 },
-            alpha: { start: 0.8, end: 0 },
-            lifespan: 200,
-            blendMode: 'ADD',
+        const emitter = this.add.particles(x, y, 'cloud', {
+            speed: { min: 20, max: 50 },
+            scale: { start: 0.05, end: 0.1 },
+            alpha: { start: 0.6, end: 0 },
+            lifespan: 300,
+            blendMode: 'NORMAL',
             emitting: false
         });
-        emitter.explode(5); // 小さな爆発（5パーティクル）
+        emitter.explode(3); // 小さな煙
         
         this.time.delayedCall(300, () => {
             emitter.destroy();
