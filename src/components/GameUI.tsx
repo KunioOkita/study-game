@@ -63,22 +63,19 @@ export const GameUI: React.FC = () => {
 
     return (
         <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
             width: '800px',
-            height: '600px',
-            pointerEvents: 'none', // クリックイベントをPhaserに貫通させる
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '20px',
-            boxSizing: 'border-box'
+            gap: '10px',
+            padding: '10px',
+            boxSizing: 'border-box',
+            backgroundColor: '#444',
+            borderRadius: '10px'
         }}>
             {/* 上部ステータス */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'white', textShadow: '2px 2px 4px #000' }}>
-                <h2>基地HP: {hp}</h2>
-                <h2>ポイント: {points}</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'white' }}>
+                <h2 style={{ margin: 0 }}>基地HP: {hp}</h2>
+                <h2 style={{ margin: 0 }}>ポイント: {points}</h2>
             </div>
 
             {/* 下部UIエリア */}
@@ -145,16 +142,16 @@ export const GameUI: React.FC = () => {
 
             {hp <= 0 && (
                 <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    position: 'fixed',
+                    inset: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     backgroundColor: 'rgba(0,0,0,0.8)',
                     color: 'red',
                     padding: '40px',
-                    borderRadius: '20px',
-                    textAlign: 'center',
-                    pointerEvents: 'auto'
+                    zIndex: 1000
                 }}>
                     <h1 style={{ margin: 0, fontSize: '48px' }}>GAME OVER</h1>
                     <button onClick={() => window.location.reload()} style={{ marginTop: '20px', padding: '10px 20px', fontSize: '20px' }}>リトライ</button>

@@ -23,8 +23,8 @@ export class MainScene extends Scene {
     }
 
     create() {
-        const bg = this.add.image(400, 300, 'background');
-        bg.setDisplaySize(800, 600);
+        const bg = this.add.image(400, 200, 'background');
+        bg.setDisplaySize(800, 400);
 
         // グループの作成
         this.enemies = this.add.group();
@@ -32,8 +32,8 @@ export class MainScene extends Scene {
         this.bullets = this.add.group();
 
         // ベース陣地（右側）
-        const base = this.add.image(750, 300, 'base');
-        base.setDisplaySize(150, 600);
+        const base = this.add.image(750, 200, 'base');
+        base.setDisplaySize(100, 400);
         this.physics.add.existing(base, true); // static
 
         // タワー配置のプレビュー
@@ -120,10 +120,12 @@ export class MainScene extends Scene {
     }
 
     spawnEnemy() {
-        const y = Phaser.Math.Between(100, 500);
+        const y = Phaser.Math.Between(50, 350);
         const enemy = this.add.image(0, y, 'enemy') as any;
         enemy.setDisplaySize(50, 50);
         this.physics.add.existing(enemy);
+        enemy.body.setSize(enemy.width * 0.6, enemy.height * 0.6);
+        enemy.body.setOffset(enemy.width * 0.2, enemy.height * 0.2);
         enemy.hp = 30; // 3発で倒せる
         this.enemies.add(enemy);
     }
@@ -139,6 +141,7 @@ export class MainScene extends Scene {
         const bullet = this.add.image(x, y, 'bullet') as any;
         bullet.setDisplaySize(20, 20);
         this.physics.add.existing(bullet);
+        bullet.body.setCircle(bullet.width * 0.3, bullet.width * 0.2, bullet.width * 0.2);
         this.bullets.add(bullet);
         this.physics.moveToObject(bullet, target, 300); // 弾の速度
     }
