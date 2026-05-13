@@ -1,73 +1,48 @@
-# React + TypeScript + Vite
+# 学習タワーディフェンス (Study Tower Defense)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+遊びながら楽しく勉強ができる、教育系タワーディフェンスゲームです。
+算数や漢字のクイズに素早く正解してポイントを稼ぎ、防衛タワーを配置して迫りくるモンスターからお城（基地）を守り抜きましょう！
 
-Currently, two official plugins are available:
+## 🎮 ゲームのルールと遊び方
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 基本ルール
+1. **敵の襲来**: 画面左からモンスターが現れ、右側にある「お城（基地）」に向かって進んできます。敵がお城に到達すると基地HPが減ってしまいます。基地HPが「0」になるとゲームオーバーです。
+2. **クイズに答える**: 画面下部にクイズが出題されます。正しい選択肢をクリックして正解すると、**20ポイント**を獲得できます。
+3. **タワーを配置する**: ポイントが**50ポイント**貯まると、「防衛タワーを配置」ボタンが押せるようになります。ボタンを押した後、ゲーム画面の好きな場所をクリックすると、そこにタワーが建ちます。
+4. **自動攻撃**: 配置されたタワーは、一番近くにいる敵を自動で感知し、魔法の弾を撃って攻撃します。
 
-## React Compiler
+### ステージ進行
+各ステージには「規定の敵の数」が設定されています。その数の敵をすべて処理（倒す、または基地に到達される）するとステージクリアとなり、次のステージへ進むことができます。
+ステージが進むごとに、出題されるクイズの種類がステップアップしていきます。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+*   **Stage 1**: 足し算（敵 10匹）
+*   **Stage 2**: 引き算（敵 15匹）
+*   **Stage 3**: 掛け算（九九）（敵 20匹）
+*   **Stage 4**: 漢字の読み（敵 25匹）
 
-## Expanding the ESLint configuration
+### 難易度の変更
+画面上部にある「難易度（Lv.1 〜 10）」のスライダーは、プレイ中いつでも自由に変更可能です。
+*   **Lv.1（やさしい）**: 敵がとてもゆっくり歩き、出現する間隔も長いため、じっくり計算問題を解くことができます。
+*   **Lv.10（激ムズ）**: 敵が超高速で走り、次から次へと大量に出現します。素早い計算力・判断力が試されます！
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 💻 ローカル環境での動かし方
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+このプロジェクトは Vite + React + TypeScript + Phaser.js で構築されています。
+開発環境でゲームを起動するには、以下のコマンドを実行してください。
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# パッケージのインストール
+npm install
+
+# 開発用サーバーの起動
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+起動後、ブラウザで `http://localhost:5173/` にアクセスするとゲームをプレイできます。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🛠 使用技術・アセット
+*   **フロントエンド**: React, TypeScript, Vite
+*   **ゲームエンジン**: Phaser 3
+*   **アセット**: AI画像生成を利用して作成し、背景透過処理などの加工を行っています。

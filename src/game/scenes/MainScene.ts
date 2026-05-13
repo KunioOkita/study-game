@@ -11,6 +11,11 @@ export class MainScene extends Scene {
     towerPreview!: Phaser.GameObjects.Image;
     currentLevel: number = 1;
 
+    targetEnemies: number = 0;
+    spawnedEnemies: number = 0;
+    completedEnemies: number = 0;
+    isStageClear: boolean = false;
+
     constructor() {
         super('MainScene');
     }
@@ -69,6 +74,18 @@ export class MainScene extends Scene {
             this.currentLevel = level;
         });
 
+        EventBus.on('start-stage', (target: number) => {
+            this.targetEnemies = target;
+            this.spawnedEnemies = 0;
+            this.completedEnemies = 0;
+            this.isStageClear = false;
+            // 盤面リセット
+            this.enemies.clear(true, true);
+            this.towers.clear(true, true);
+            this.bullets.clear(true, true);
+            this.nextEnemyTime = this.time.now + 1000;
+        });
+
         // 衝突判定: 弾と敵
         this.physics.add.overlap(this.bullets, this.enemies, (bullet: any, enemy: any) => {
             this.createHitEffect(bullet.x, bullet.y);
@@ -86,7 +103,9 @@ export class MainScene extends Scene {
             if (enemy.hp <= 0) {
                 this.createExplosion(enemy.x, enemy.y);
                 enemy.destroy();
+                this.completedEnemies++;
                 EventBus.emit('enemy-killed');
+                this.checkStageClear();
             }
         });
 
@@ -94,11 +113,19 @@ export class MainScene extends Scene {
         EventBus.emit('current-scene-ready', this);
     }
 
+    checkStageClear() {
+        if (!this.isStageClear && this.targetEnemies > 0 && this.completedEnemies >= this.targetEnemies) {
+            this.isStageClear = true;
+            EventBus.emit('stage-clear');
+        }
+    }
+
     update(time: number, _delta: number) {
         // 敵の生成 (Lv1: 4秒に1匹, Lv10: 0.85秒に1匹)
         const spawnInterval = 4000 - (this.currentLevel - 1) * 350;
-        if (time > this.nextEnemyTime) {
+        if (!this.isStageClear && this.spawnedEnemies < this.targetEnemies && time > this.nextEnemyTime) {
             this.spawnEnemy();
+            this.spawnedEnemies++;
             this.nextEnemyTime = time + spawnInterval;
         }
 
@@ -110,7 +137,9 @@ export class MainScene extends Scene {
             if (enemy.x > 700) {
                 // ベースに到達
                 enemy.destroy();
+                this.completedEnemies++;
                 EventBus.emit('base-damaged', 10); // ダメージ10
+                this.checkStageClear();
             }
         });
 
