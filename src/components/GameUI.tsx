@@ -4,6 +4,7 @@ import { EventBus } from '../game/EventBus';
 export const GameUI: React.FC = () => {
     const [points, setPoints] = useState(0);
     const [hp, setHp] = useState(100);
+    const [level, setLevel] = useState(1);
     const [question, setQuestion] = useState({ q: '', a: 0 });
     const [options, setOptions] = useState<number[]>([]);
 
@@ -61,6 +62,12 @@ export const GameUI: React.FC = () => {
         }
     };
 
+    const handleLevelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newLevel = parseInt(e.target.value, 10);
+        setLevel(newLevel);
+        EventBus.emit('change-difficulty', newLevel);
+    };
+
     return (
         <div style={{
             width: '800px',
@@ -73,8 +80,20 @@ export const GameUI: React.FC = () => {
             borderRadius: '10px'
         }}>
             {/* 上部ステータス */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'white' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'white', alignItems: 'center' }}>
                 <h2 style={{ margin: 0 }}>基地HP: {hp}</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label htmlFor="difficulty" style={{ fontWeight: 'bold' }}>難易度: Lv.{level}</label>
+                    <input 
+                        type="range" 
+                        id="difficulty" 
+                        min="1" 
+                        max="10" 
+                        value={level} 
+                        onChange={handleLevelChange}
+                        style={{ cursor: 'pointer' }}
+                    />
+                </div>
                 <h2 style={{ margin: 0 }}>ポイント: {points}</h2>
             </div>
 

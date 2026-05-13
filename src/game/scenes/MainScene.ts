@@ -9,6 +9,7 @@ export class MainScene extends Scene {
     nextEnemyTime: number = 0;
     placingTower: boolean = false;
     towerPreview!: Phaser.GameObjects.Image;
+    currentLevel: number = 1;
 
     constructor() {
         super('MainScene');
@@ -63,6 +64,10 @@ export class MainScene extends Scene {
             this.towerPreview.setVisible(true);
         });
 
+        EventBus.on('change-difficulty', (level: number) => {
+            this.currentLevel = level;
+        });
+
         // 衝突判定: 弾と敵
         this.physics.add.overlap(this.bullets, this.enemies, (bullet: any, enemy: any) => {
             this.createHitEffect(bullet.x, bullet.y);
@@ -90,15 +95,17 @@ export class MainScene extends Scene {
 
     update(time: number, _delta: number) {
         // 敵の生成
+        const spawnInterval = 2000 - (this.currentLevel - 1) * 150;
         if (time > this.nextEnemyTime) {
             this.spawnEnemy();
-            this.nextEnemyTime = time + 2000; // 2秒ごとに生成
+            this.nextEnemyTime = time + spawnInterval;
         }
 
         // 敵の移動とベース到達判定
+        const speed = 1 + (this.currentLevel - 1) * 0.2;
         this.enemies.getChildren().forEach((child: any) => {
             const enemy = child as Phaser.GameObjects.Image & { hp: number };
-            enemy.x += 1; // 移動速度
+            enemy.x += speed; // 移動速度
             if (enemy.x > 700) {
                 // ベースに到達
                 enemy.destroy();
